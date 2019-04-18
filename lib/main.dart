@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 void main() async {
   //QuerySnapshot snapshot = await Firestore.instance.collection("usuarios").getDocuments();
@@ -25,14 +29,16 @@ final auth = FirebaseAuth.instance;
 Future<Null> _ensureLoggedIn() async {
   GoogleSignInAccount user = googleSignIn.currentUser; // verifica se existe algum usuário logado 
   if (user == null) {
-   user = await  googleSignIn.signInSilently(); // faz a autenticação silenciosa no google
+   user = await googleSignIn.signInSilently(); // faz a autenticação silenciosa no google
   }
   if (user == null) {
     user = await googleSignIn.signIn(); // mostra uma janela para fazer autenticação com o google
   }
   if (await auth.currentUser() == null) { // Autentica o usuário no firebase
     GoogleSignInAuthentication credentials = await googleSignIn.currentUser.authentication;
-    await auth.signInWithGoogle(idToken: credentials.idToken, accessToken: credentials.accessToken);
+    //await auth.signInWithGoogle(idToken: credentials.idToken, accessToken: credentials.accessToken);
+    await auth.linkWithGoogleCredential(
+    idToken: credentials.idToken, accessToken: credentials.accessToken);
   }
 }
 
@@ -151,12 +157,23 @@ class _TextComposerState extends State<TextComposer> {
             : null,
         child: Row(
           children: <Widget>[
+            /*
             Container(
               child: IconButton(
                 icon: Icon(Icons.photo_camera),
-                onPressed: () {},
+                onPressed: () async {
+                  await _ensureLoggedIn();
+                  File imgFile = await ImagePicker.pickImage(source: ImageSource.camera);
+                  if (imgFile == null) return;
+                    StorageUploadTask task = FirebaseStorage.instance.ref()
+                        .child(googleSignIn.currentUser.id.toString() + DateTime.now().millisecondsSinceEpoch.toString()).putFile(imgFile);
+                    StorageTaskSnapshot taskSnapshot = await task.onComplete;
+                    String url = await taskSnapshot.ref.getDownloadURL();
+                    _sendMessage(imgUrl: url);
+                },
               ),
             ),
+            */
             Expanded(
               child: TextField(
                 controller: _textController,
@@ -224,7 +241,6 @@ class ChatMessage extends StatelessWidget {
                     Image.network(data["imgUrl"], width: 250.0,) :
                       Text(data["text"])
                 ),
-
               ],
             ),
           )
