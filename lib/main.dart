@@ -20,7 +20,8 @@ final ThemeData KIOSTheme = ThemeData(
     primaryColorBrightness: Brightness.light);
 
 final ThemeData KDefaultTheme =
-    ThemeData(primarySwatch: Colors.orange, accentColor: Colors.orange[400]);
+    //ThemeData(primarySwatch: Colors.orange, accentColor: Colors.orange[400]);
+    ThemeData(primarySwatch: Colors.red, accentColor: Colors.red[400]);
 
 
 final googleSignIn = GoogleSignIn();
