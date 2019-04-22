@@ -38,8 +38,10 @@ Future<Null> _ensureLoggedIn() async {
   if (await auth.currentUser() == null) { // Autentica o usuário no firebase
     GoogleSignInAuthentication credentials = await googleSignIn.currentUser.authentication;
     await auth.signInWithGoogle(idToken: credentials.idToken, accessToken: credentials.accessToken);
-    await auth.linkWithGoogleCredential(
-    idToken: credentials.idToken, accessToken: credentials.accessToken);
+    /*await auth.linkWithGoogleCredential(
+        idToken: credentials.idToken, 
+        accessToken: credentials.accessToken);
+        */
   }
 }
 
